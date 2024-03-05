@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model arh_verificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model arh_activateToken {
+  id          Int       @id @default(autoincrement())
+  token       String    @unique
+  activatedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      Int
+  user        arh_user  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model arh_user {
+  id                  Int                 @id @default(autoincrement())
+  username            String?             @unique
+  password            String
+  email               String              @unique
+  cid                 String              @unique
+  positionId          Int?
+  prefixId            Int?
+  tel                 String?
+  firstname           String?
+  lastname            String?
+  birthdate           DateTime?
+  role                Role?               @default(USER)
+  forgetpasswordtoken String?
+  verified_user       Boolean             @default(false)
+  emailVerified       DateTime?
+  isActive            Boolean?            @default(true)
+  online              Boolean             @default(false)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  content             arh_content[]
+  arh_activateToken   arh_activateToken[]
+  position            arh_position?       @relation(fields: [positionId], references: [id])
+  prefix              arh_prefix?         @relation(fields: [prefixId], references: [id])
+}
+
+model arh_content {
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(255)
+  description String?      @db.Text
+  files       String?      @db.Text
+  images      String?      @db.Text
+  published   Boolean      @default(true)
+  viewCount   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  userId      Int
+  categoryId  Int
+  user        arh_user     @relation(fields: [userId], references: [id])
+  category    arh_category @relation(fields: [categoryId], references: [id])
+}
+
+model arh_category {
+  id      Int           @id @default(autoincrement())
+  name    String
+  active  Boolean?      @default(true)
+  content arh_content[]
+}
+
+model arh_sendcontact {
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(50)
+  subject   String?  @db.VarChar(255)
+  email     String?  @db.VarChar(50)
+  tel       String?  @db.VarChar(20)
+  message   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model arh_internalphone {
+  id         Int      @id @default(autoincrement())
+  department String?  @db.VarChar(50)
+  phone      String?  @db.VarChar(50)
+  building   String?  @db.VarChar(50)
+  floor      String?  @db.VarChar(2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model arh_position {
+  id     Int        @id @default(autoincrement())
+  name   String?    @db.VarChar(50)
+  active Boolean?   @default(true)
+  user   arh_user[]
+}
+
+model arh_prefix {
+  id     Int        @id @default(autoincrement())
+  name   String?    @db.VarChar(50)
+  active Boolean?   @default(true)
+  user   arh_user[]
+}
+
+model arh_project {
+  id          Int      @id @default(autoincrement())
+  title       String?  @db.VarChar(50)
+  description String?  @db.VarChar(50)
+  active      Boolean? @default(true)
+}
+
+enum Role {
+  USER
+  ADMIN
+}

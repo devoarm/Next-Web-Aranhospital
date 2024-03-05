@@ -1,0 +1,9 @@
+#cc-main {
+    --cc-btn-primary-bg: #a489e7;
+    --cc-btn-primary-border-color: #ffffff;
+    --cc-btn-primary-hover-bg: #8966e2;
+    --cc-btn-primary-hover-border-color: #444444;
+    --cc-toggle-on-bg: var(--cc-btn-primary-bg);
+    --cc-btn-border-radius: 10px;
+    --cc-footer-bg: #ac97e0;
+}
